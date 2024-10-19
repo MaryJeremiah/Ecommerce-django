@@ -1,8 +1,13 @@
 from django.db import models
+from django.contrib.auth.models import User
 
 class Category(models.Model):
     name = models.CharField(max_length=100)
     slug = models.SlugField(unique=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name_plural = 'Categories'
 
     def __str__(self):
         return self.name
@@ -23,17 +28,10 @@ class Product(models.Model):
 
 class Comment(models.Model):
     product = models.ForeignKey(Product, related_name='comments', on_delete=models.CASCADE)
-    user = models.CharField(max_length=100)
+    user = models.ForeignKey(User, related_name='comments', on_delete=models.CASCADE)  # Changed to ForeignKey to link to actual users
     content = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f'Comment by {self.user} on {self.product}'
-
-
-
-
-
-
-
+        return f'Comment by {self.user.username} on {self.product}'
 

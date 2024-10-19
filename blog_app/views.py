@@ -1,38 +1,27 @@
-from rest_framework import generics
-from rest_framework import generics, permissions
-from .models import Product
-from .serializers import ProductSerializer
+from django.shortcuts import render
+from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
+from .models import Category, Product, Comment
+from .serializers import CategorySerializer, ProductSerializer, CommentSerializer
 
-
-from django.http import HttpResponse
-
+# Define the home view
 def home(request):
-    return HttpResponse("Welcome to the E-commerce API!")
+    return render(request, 'blog_app/home.html')  # Ensure this template exists
 
+class CategoryViewSet(viewsets.ModelViewSet):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+    permission_classes = [IsAuthenticated]
 
+class ProductViewSet(viewsets.ModelViewSet):
+    queryset = Product.objects.all()
+    serializer_class = ProductSerializer
+    permission_classes = [IsAuthenticated]
 
-permission_classes = [IsAuthenticated]
-class ProductListCreateAPIView(generics.ListCreateAPIView):
-    """
-    API view to retrieve a list of products or create a new product.
-    """
-    queryset = Product.objects.all()  # Get all products from the database
-    serializer_class = ProductSerializer  # Use the ProductSerializer for serialization
-    permission_classes = [permissions.AllowAny]  # Set permissions for this view
+class CommentViewSet(viewsets.ModelViewSet):
+    queryset = Comment.objects.all()
+    serializer_class = CommentSerializer
+    permission_classes = [IsAuthenticated]
 
     def perform_create(self, serializer):
-        """
-        Save the new product instance using the serializer.
-        """
-        serializer.save()  # Call the save method to create the new product
-
-
-class ProductRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
-    """
-    API view to retrieve, update, or delete a product by its ID.
-    """
-    queryset = Product.objects.all()  # Get all products from the database
-    serializer_class = ProductSerializer  # Use the ProductSerializer for serialization
-    permission_classes = [permissions.AllowAny]  # Set permissions for this view
-
+        serializer.save(user=self.request.user)

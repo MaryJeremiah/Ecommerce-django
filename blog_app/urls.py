@@ -1,8 +1,15 @@
 from django.urls import path
-from .views import ProductListCreateAPIView, ProductRetrieveUpdateDestroyAPIView
+from .views import home, CategoryViewSet, ProductViewSet, CommentViewSet
+from rest_framework.routers import DefaultRouter
+
+# Set up router for the viewsets
+router = DefaultRouter()
+router.register(r'categories', CategoryViewSet)
+router.register(r'products', ProductViewSet)
+router.register(r'comments', CommentViewSet)
 
 urlpatterns = [
-    path('products/', ProductListCreateAPIView.as_view(), name='product-list-create'),
-    path('products/<int:pk>/', ProductRetrieveUpdateDestroyAPIView.as_view(), name='product-retrieve-update-destroy'),
+    path('', home, name='blog-home'),  # Home view
 ]
 
+urlpatterns += router.urls  # Add API endpoints to urlpatterns
